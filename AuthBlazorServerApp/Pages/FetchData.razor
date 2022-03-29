@@ -1,4 +1,5 @@
 ﻿@page "/fetchdata"
+@attribute [Authorize(Policy = "Test")]
 
 <PageTitle>Weather forecast</PageTitle>
 
@@ -39,10 +40,14 @@ else
 }
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
+
     private WeatherForecast[]? forecasts;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        var authState = await AuthenticationState;
+        forecasts = await ForecastService.GetForecastAsync(DateTime.Now, authState.User);
     }
 }

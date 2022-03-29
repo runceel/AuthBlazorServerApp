@@ -1,19 +1,31 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+
 namespace AuthBlazorServerApp.Data;
 
 public class WeatherForecastService
 {
     private static readonly string[] Summaries = new[]
     {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+    };
+    private readonly IAuthorizationService _authorizationService;
 
-    public Task<WeatherForecast[]> GetForecastAsync(DateTime startDate)
+    public WeatherForecastService(IAuthorizationService authorizationService)
     {
-        return Task.FromResult(Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        _authorizationService = authorizationService;
+    }
+
+    public async Task<WeatherForecast[]> GetForecastAsync(DateTime startDate, ClaimsPrincipal user)
+    {
+        // ユーザーが Test ポリシーを満たしているかどうか
+        var result = await _authorizationService.AuthorizeAsync(user, "Test");
+        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
         {
             Date = startDate.AddDays(index),
             TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        }).ToArray());
+            // Test ポリシーを満たしているなら全データを Warm にする
+            Summary = result.Succeeded ? "Warm" : Summaries[Random.Shared.Next(Summaries.Length)]
+        }).ToArray();
     }
 }

@@ -1,0 +1,69 @@
+﻿@page
+@using Microsoft.AspNetCore.Authorization
+@attribute [AllowAnonymous]
+@model AuthBlazorServerApp.Areas.MySignin.Pages.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<h1>ログインページ</h1>
+
+<form method="post">
+    <label for="userName">ユーザー名:</label>
+    <input id="userName" asp-for="UserName" />
+    <input type="submit" value="ログイン" />
+</form>
+
+<p>ユーザー名によって以下の違いがあります。</p>
+
+<h3>付与されるロール</h3>
+
+<h4>ユーザー名が Admin の場合</h4>
+
+<p>付与されるロール</p>
+
+<ul>
+    <li>User</li>
+    <li>Administrator</li>
+</ul>
+
+<h4>ユーザー名が Admin 意外の場合</h4>
+
+<p>付与されるロール</p>
+
+<ul>
+    <li>User</li>
+</ul>
+
+<h3>カスタムロール</h3>
+
+<p>ログインをすることで EmployeeNumber というクレームも付与されます。値は以下のようになっています。</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>ユーザー名</th>
+            <th>EmployeeNumber</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Admin</td>
+            <td>0001</td>
+        </tr>
+        <tr>
+            <td>Kazuki</td>
+            <td>0011</td>
+        </tr>
+        <tr>
+            <td>Shinji</td>
+            <td>0111</td>
+        </tr>
+        <tr>
+            <td>Kazuaki</td>
+            <td>1111</td>
+        </tr>
+        <tr>
+            <td>その他の場合</td>
+            <td>9999</td>
+        </tr>
+    </tbody>
+</table>

@@ -1,4 +1,5 @@
 ﻿@page "/counter"
+@attribute [AllowAnonymous]
 
 <PageTitle>Counter</PageTitle>
 
@@ -9,10 +10,18 @@
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> x { get; set; } = null!;
+
     private int currentCount = 0;
 
-    private void IncrementCount()
+    private async Task IncrementCount()
     {
-        currentCount++;
+        // Administrator じゃない人は 10 までしかカウントアップできない
+        var auth = await x;
+        if (auth.User.IsInRole("Administrator") || currentCount < 10)
+        {
+            currentCount++;
+        }
     }
 }

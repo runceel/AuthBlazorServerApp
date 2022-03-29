@@ -1,5 +1,7 @@
+using AuthBlazorServerApp.Auth;
 using AuthBlazorServerApp.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 
@@ -12,7 +14,31 @@ builder.Services.AddSingleton<WeatherForecastService>();
 
 // 認証系のサービスを追加
 builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme);
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        // 独自のログインページの URL
+        options.LoginPath = "/MyLogin";
+    });
+
+// カスタムのハンドラー！
+builder.Services.AddSingleton<IAuthorizationHandler, TestAuthHandler>(); // Scoped でも Transient でも可
+
+builder.Services.AddAuthorization(options =>
+{
+    // EmployeeNumber が 0001 か 0011 の人のみ通すポリシー
+    options.AddPolicy("EmployeeNumberIs0001Or0011", builder =>
+    {
+        builder.RequireClaim("EmployeeNumber", "0001", "0011");
+    });
+
+    // Test という名前のポリシーを登録
+    options.AddPolicy("Test", builder =>
+    {
+        // ここで IAuthorizationRequirement を実装したクラスを設定する。
+        builder.AddRequirements(new TestRequirement());
+    });
+});
 
 var app = builder.Build();
 
