@@ -13,7 +13,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
 // 認証系のサービスを追加
-builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
+// builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
@@ -38,6 +38,8 @@ builder.Services.AddAuthorization(options =>
         // ここで IAuthorizationRequirement を実装したクラスを設定する。
         builder.AddRequirements(new TestRequirement());
     });
+
+    options.FallbackPolicy = options.DefaultPolicy;
 });
 
 var app = builder.Build();

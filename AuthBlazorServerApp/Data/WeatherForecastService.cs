@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using AuthBlazorServerApp.Auth;
 using Microsoft.AspNetCore.Authorization;
 
 namespace AuthBlazorServerApp.Data;
@@ -19,7 +20,9 @@ public class WeatherForecastService
     public async Task<WeatherForecast[]> GetForecastAsync(DateTime startDate, ClaimsPrincipal user)
     {
         // ユーザーが Test ポリシーを満たしているかどうか
-        var result = await _authorizationService.AuthorizeAsync(user, "Test");
+        var result = await _authorizationService.AuthorizeAsync(user, new AuthorizationPolicy(
+            new[] { new TestRequirement() },
+            Enumerable.Empty<string>()));
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
         {
             Date = startDate.AddDays(index),
